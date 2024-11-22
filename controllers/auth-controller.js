@@ -24,7 +24,7 @@ const register = async (req, res) => {
     //Create a new user
     const userCreated = await User.create({ username, email, phone, password });
 
-    res.status(200).json({
+    res.status(201).json({
       message: "registration sucessful",
       token: await userCreated.generateToken(),
       userId: userCreated._id.toString(),
@@ -48,7 +48,9 @@ const login = async (req, res) => {
     }
 
     //Compare Password
-    const isPasswordValid = await bcrypt.compare(password, userExist.password);
+    // const isPasswordValid = await bcrypt.compare(password, userExist.password);
+
+    const isPasswordValid = await userExist.comparePassword(password);
 
     if (isPasswordValid) {
       res.status(200).json({
@@ -60,7 +62,8 @@ const login = async (req, res) => {
       res.status(401).json({ message: "Invalid email or password" });
     }
   } catch (error) {
-    res.status(500).json({ msg: "Internal server error" });
+    // res.status(500).json({ msg: "Internal server error" });
+    next(error);
   }
 };
 
